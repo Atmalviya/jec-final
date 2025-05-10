@@ -53,10 +53,10 @@ import React, { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-// import { SignUpSchema } from "@/schemas";
+import { SignUpSchema } from "@/schemas";
 import FormMessage from "@/components/auth/FormMessage";
 import * as z from "zod";
-// import { signUp } from "@/actions/signUp";
+import { signUp } from "@/actions/signUp";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
 
@@ -74,12 +74,20 @@ export function SignupForm() {
     setFormMessage({message : "", type : ""});
     try {
       console.log("formData",formData)
-      // SignUpSchema.parse(formData)
-      // await signUp(formData)
-      //   .then((data) => {
-      //     setFormMessage({message : data.message, type :data.type});
-      //     setloading(false)
-      //   })
+      SignUpSchema.parse(formData)
+      await signUp(formData)
+        .then((data) => {
+          setFormMessage({message : data.message, type :data.type});
+          setloading(false)
+        })
+        .catch((error) => {
+          if(error instanceof Error){
+            setFormMessage({message : error.message, type : "error"});
+          }
+          else{
+            setFormMessage({message : "Something went wrong", type : "error"});
+          }
+        })
     } catch (err) {
       if (err instanceof z.ZodError) {
         const errorMessages: Record<string, string> = {};

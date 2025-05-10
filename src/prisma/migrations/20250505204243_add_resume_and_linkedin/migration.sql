@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "users" ALTER COLUMN "resume" DROP NOT NULL,
+ALTER COLUMN "linkedin" DROP NOT NULL;

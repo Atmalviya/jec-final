@@ -1,6 +1,5 @@
 import React from 'react'
-import { LoginForm } from "@/components/auth/login-form";
-import { SignInForm } from "@/components/auth/signin-form";
+import { SignInForm } from "@/components/auth/signinForm";
 const page = () => {
   return (
     <div className='flex justify-center items-center h-screen'>

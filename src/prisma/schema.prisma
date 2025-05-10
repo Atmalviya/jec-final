@@ -1,0 +1,126 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+// prisma/schema.prisma
+datasource db {
+  provider  = "postgresql"
+  url  	    = env("DATABASE_URL")
+  // uncomment next line if you use Prisma <5.10
+  // directUrl = env("DATABASE_URL_UNPOOLED")
+}
+
+model Account {
+  id                 String  @id @default(cuid())
+  userId             String  @map("user_id")
+  type               String
+  provider           String
+  providerAccountId  String  @map("provider_account_id")
+  refresh_token      String? @db.Text
+  access_token       String? @db.Text
+  expires_at         Int?
+  token_type         String?
+  scope              String?
+  id_token           String? @db.Text
+  session_state      String?
+ 
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+ 
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
+}
+ 
+ enum UserRole {
+  ADMIN
+  USER
+ }
+
+  enum Gender {
+    MALE
+    FEMALE
+  }
+
+model User {
+  id                  String    @id @default(cuid())
+  firstName           String    
+  lastName            String
+  email               String    @unique
+  userName            String    @unique
+  password            String    @db.Text
+  emailVerified       DateTime? @map("email_verified")
+  image               String?
+  gender              Gender    @default(MALE)
+  role                UserRole  @default(USER)
+  contact             String?    
+  accounts            Account[]
+  academicInfo        AcademicInfo?
+  isProfileComplete   Boolean?  @default(false)
+  resume              String?
+  linkedin            String?
+ 
+  @@map("users")
+}
+
+
+
+model VerificationToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+
+  @@unique([email, token])
+}
+
+model PasswordResetToken {
+  id        String   @id @default(cuid())
+  email     String
+  token     String   @unique
+  expires   DateTime
+
+  @@unique([email, token])
+}
+
+
+model AcademicInfo {
+  userName      String  @id  
+
+  // Undergraduate Info
+  ugDegree      String?
+  ugBranch      String?
+  ugBatch       String?
+  UGCGPA        Float?
+  ugActiveBacks Int?
+  ugTotalBacks  Int?
+
+  // Postgraduate Info
+  pgDegree      String?
+  pgBranch      String?
+  pgBatch       String?
+  PGCGPA        Float?
+  pgActiveBacks Int?
+  pgTotalBacks  Int?
+
+  // Higher Secondary (HSC) Info
+  hscBoard      String?
+  hscYear       Int?
+  hscPercentage Float?
+
+  // Secondary School (SS) Info
+  ssBoard       String?
+  ssYear        Int?
+  ssPercentage  Float?
+
+  user User @relation(fields: [userName], references: [userName], onDelete: Cascade)
+
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@map("academic_info")
+}

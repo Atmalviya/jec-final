@@ -3,12 +3,12 @@ import React, { useState } from "react";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-// import { SignInSchema } from "@/schemas";
+import { SignInSchema } from "@/schemas";
 import FormMessage from "./FormMessage";
 import * as z from "zod";
 import { Loader2 } from "lucide-react";
 import Link from "next/link";
-// import { signInAction } from "@/actions/signIn";
+import { signInAction } from "@/actions/signIn";
 
 export function SignInForm() {
   const [formData, setFormData] = useState({ email: "", password: "" });
@@ -24,14 +24,25 @@ export function SignInForm() {
     e.preventDefault();
     try {
       console.log("login formData",formData)
-      // SignInSchema.parse(formData);
-      //   signInAction(formData).then((data) => {
-      //     setFormMessage({
-      //       message: data?.message || "",
-      //       type: data?.type || "",
-      //     });
-      //     setloading(false);
-      //   });
+      SignInSchema.parse(formData);
+      signInAction(formData)
+      .then((data) => {
+        setFormMessage({
+          message: data?.message || "",
+          type: data?.type || "",
+        });
+        setloading(false);
+      })
+      .catch((error) => {
+        if(error instanceof Error){
+          setFormMessage({ message: error.message, type: "error" });
+        }
+        else{
+          setFormMessage({ message: "Something went wrong", type: "error" });
+        }
+        console.log(error);
+        setloading(false);
+      });
     } catch (err) {
       if (err instanceof z.ZodError) {
         const errorMessages: Record<string, string> = {};
